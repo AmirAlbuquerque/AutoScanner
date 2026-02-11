@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 from src.database.infrastructure.repositories import user_db
 from src.services import auth_service
-from src.domain import user_roles
+from domain import user_rules
 from src.common.logging import get_logger
 
 logger = get_logger("user_service")
@@ -47,12 +47,12 @@ def admin_create_user(
 
 def admin_list_users(actor_payload: dict[str, Any]) -> list[dict[str, Any]]:
     actor = _get_actor(actor_payload)
-    user_roles.ensure_admin(actor)
+    user_rules.ensure_admin(actor)
     return user_db.list_users()
 
 def admin_get_user(actor_payload: dict[str, Any], user_id: str) -> Optional[dict[str, Any]]:
     actor = _get_actor(actor_payload)
-    user_roles.ensure_admin(actor)
+    user_rules.ensure_admin(actor)
     return user_db.get_user(user_id)
 
 def admin_update_user(
@@ -65,7 +65,7 @@ def admin_update_user(
     active: int,
 ) -> None:
     actor = _get_actor(actor_payload)
-    user_roles.ensure_admin(actor)
+    user_rules.ensure_admin(actor)
 
     role = role.strip().upper()
     if role not in ROLES:
@@ -83,7 +83,7 @@ def admin_set_password(
     new_password: str,
 ) -> None:
     actor = _get_actor(actor_payload)
-    user_roles.ensure_admin(actor)
+    user_rules.ensure_admin(actor)
     if len(new_password) < 6:
         raise ValueError("Senha deve ter pelo menos 6 caracteres.")
 
@@ -94,6 +94,6 @@ def admin_set_password(
 
 def admin_delete_user(actor_payload: dict[str, Any], user_id: str) -> None:
     actor = _get_actor(actor_payload)
-    user_roles.ensure_admin(actor)
+    user_rules.ensure_admin(actor)
     user_db.delete_user(user_id)
     logger.info(f"[ADMIN_DELETE_USER] actor={actor_payload.get('email')} user_id={user_id}")
