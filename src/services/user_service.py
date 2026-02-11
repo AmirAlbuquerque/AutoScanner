@@ -1,8 +1,9 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any, Optional
 from src.database.infrastructure.repositories import user_db
 from src.services import auth_service
+from src.domain import user_roles
 from src.common.logging import get_logger
 
 logger = get_logger("user_service")
@@ -11,11 +12,9 @@ ROLES = {"ADMIN", "GERENTE", "COORDENADOR", "PESQUISADOR", "LOJISTA"}
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-# def _now_utc() -> datetime:
-#     return datetime.now(timezone.utc)
-
-# def _now_iso() -> str:
-#     return _now_utc().isoformat()
+def _get_actor(payload):
+    actor = auth_service.require_authenticated(payload)
+    return auth_service.require_active_user(actor)
 
 # ---------------------------
 # CRUD de usuários (ADMIN)
@@ -47,11 +46,13 @@ def admin_create_user(
     return user_id
 
 def admin_list_users(actor_payload: dict[str, Any]) -> list[dict[str, Any]]:
-    auth_service._require_admin(actor_payload)
+    actor = _get_actor(actor_payload)
+    user_roles.ensure_admin(actor)
     return user_db.list_users()
 
 def admin_get_user(actor_payload: dict[str, Any], user_id: str) -> Optional[dict[str, Any]]:
-    auth_service._require_admin(actor_payload)
+    actor = _get_actor(actor_payload)
+    user_roles.ensure_admin(actor)
     return user_db.get_user(user_id)
 
 def admin_update_user(
@@ -63,7 +64,8 @@ def admin_update_user(
     region: Optional[str],
     active: int,
 ) -> None:
-    auth_service._require_admin(actor_payload)
+    actor = _get_actor(actor_payload)
+    user_roles.ensure_admin(actor)
 
     role = role.strip().upper()
     if role not in ROLES:
@@ -80,7 +82,8 @@ def admin_set_password(
     user_id: str,
     new_password: str,
 ) -> None:
-    auth_service._require_admin(actor_payload)
+    actor = _get_actor(actor_payload)
+    user_roles.ensure_admin(actor)
     if len(new_password) < 6:
         raise ValueError("Senha deve ter pelo menos 6 caracteres.")
 
@@ -90,6 +93,7 @@ def admin_set_password(
     logger.info(f"[ADMIN_SET_PASSWORD] actor={actor_payload.get('email')} user_id={user_id}")
 
 def admin_delete_user(actor_payload: dict[str, Any], user_id: str) -> None:
-    auth_service._require_admin(actor_payload)
+    actor = _get_actor(actor_payload)
+    user_roles.ensure_admin(actor)
     user_db.delete_user(user_id)
     logger.info(f"[ADMIN_DELETE_USER] actor={actor_payload.get('email')} user_id={user_id}")
