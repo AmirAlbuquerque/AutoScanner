@@ -1,0 +1,6 @@
+import os
+
+SECRET_KEY = os.getenv("AUTOSCANNER_SECRET_KEY", "CHANGE_ME_DEV_SECRET")
+ALGORITHM = "HS256"
+ISSUER = "autoscanner"
+TOKEN_TTL_HOURS = int(os.getenv("AUTOSCANNER_TOKEN_TTL_HOURS", "8"))
