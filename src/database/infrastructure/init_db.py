@@ -6,7 +6,8 @@ from src.database.infrastructure.connection import get_conn
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-def create_users() -> None:
+def create_tables() -> None:
+    #Criação da tabela users
     with get_conn() as conn:
         conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
@@ -18,6 +19,26 @@ def create_users() -> None:
             password_hash TEXT NOT NULL,
             active INTEGER NOT NULL DEFAULT 1,
             created_at TEXT NOT NULL
+        );
+        """)
+
+        # Cria a tabela de stores
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS stores (
+            id TEXT PRIMARY KEY,
+            owner_id TEXT,
+            name TEXT NOT NULL,
+            region TEXT NOT NULL,
+            status TEXT NOT NULL CHECK(status IN ('PENDENTE','APROVADA','REPROVADA','INATIVA')),
+            rejection_reason TEXT,
+            approved_by TEXT,
+            approved_at TEXT,
+            created_by TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT,
+            FOREIGN KEY(owner_id) REFERENCES users(id),
+            FOREIGN KEY(approved_by) REFERENCES users(id),
+            FOREIGN KEY(created_by) REFERENCES users(id)
         );
         """)
 
@@ -38,7 +59,7 @@ def seed_admin(email: str = "admin@autoscanner.local", password: str = "admin123
         )
 
 def init_db() -> None:
-    create_users()
+    create_tables()
     seed_admin()
 
 if __name__ == "__main__":
