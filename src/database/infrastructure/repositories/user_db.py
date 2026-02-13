@@ -54,3 +54,11 @@ def set_password (new_hash_password, user_id) -> None:
 def delete_user (user_id) -> None:
      with get_conn() as conn:
         conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
+
+def get_user_by_id(user_id: str) -> Optional[dict[str, Any]]:
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT id, name, email, role, region, active, created_at FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+    return dict(row) if row else None
