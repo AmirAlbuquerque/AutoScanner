@@ -5,7 +5,6 @@ from src.ui.session import is_logged_in, current_user, logout
 
 from src.services import catalog_service
 from src.services.public_queries_service import public_query_prices
-from src.database.data.seed import run_seed
 
 init_db()
 
