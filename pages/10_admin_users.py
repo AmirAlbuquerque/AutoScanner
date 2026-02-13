@@ -1,23 +1,13 @@
 import streamlit as st
-
-from src.ui.session import require_role, logout
-from src.services import auth_service
+from src.ui.session import require_role
+from src.ui.layout import header, sidebar_nav
 from src.services import user_service
 
-
-st.set_page_config(page_title="Admin - Usuários", layout="wide")
+st.set_page_config(page_title="Admin - Usuários", page_icon="👤", layout="wide")
 
 user = require_role("ADMIN")
-
-st.title("Administração - Usuários")
-st.caption(f"Logado como: {user.get('email')} | Role: {user.get('role')}")
-
-colA, colB = st.columns([1, 5], vertical_alignment="center")
-with colA:
-    if st.button("Sair"):
-        logout()
-
-st.divider()
+header("Administração", "Usuários do sistema")
+sidebar_nav(user["role"])
 
 tabs = st.tabs(["Listar", "Criar", "Editar", "Senha", "Excluir"])
 
