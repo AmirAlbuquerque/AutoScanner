@@ -72,3 +72,7 @@ def list_vehicle_captures(capture_id: str) -> list[dict[str, Any]]:
             (capture_id,),
         ).fetchall()
     return [dict(r) for r in rows]
+
+def delete_vehicle_captures_by_capture(capture_id: str) -> None:
+    with get_conn() as conn:
+        conn.execute("DELETE FROM vehicle_captures WHERE capture_id = ?", (capture_id,))
