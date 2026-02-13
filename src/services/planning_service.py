@@ -1,15 +1,97 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from typing import Any, Optional
 
+from database.infrastructure.repositories import planning_read_db
 from src.services import auth_service
 from src.domain import planning_rules
 from src.database.infrastructure.repositories import weekly_plannings_db
 from src.database.infrastructure.repositories import planning_assignments_db
-from src.database.infrastructure.repositories import stores_db  # precisa ter get_store_region_and_status()
+from src.database.infrastructure.repositories import stores_db
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+# Helper
+def week_start_monday(d: date) -> str:
+    monday = d.fromordinal(d.toordinal() - d.weekday())  # weekday: Mon=0
+    return monday.isoformat()
+
+# ---------------------------
+# VISUALIZAÇÃO - COORDENADOR
+# ---------------------------
+
+def coordinator_list_plannings_overview(actor_payload: dict[str, Any], limit: int = 200) -> list[dict[str, Any]]:
+    actor = auth_service.require_authenticated(actor_payload)
+    auth_service.require_active_user(actor)
+    planning_rules.ensure_coordinator(actor)
+
+    if not actor.region:
+        raise ValueError("Coordenador sem região definida.")
+
+    return planning_read_db.list_plannings_summary_by_region(actor.region, limit=limit)
+
+
+def coordinator_view_planning(actor_payload: dict[str, Any], planning_id: str) -> dict[str, Any]:
+    """
+    Retorna:
+    - header do planejamento
+    - lista detalhada de atribuições (store + researcher)
+    """
+    actor = auth_service.require_authenticated(actor_payload)
+    auth_service.require_active_user(actor)
+    planning_rules.ensure_coordinator(actor)
+
+    header = planning_read_db.get_planning_header(planning_id)
+    if not header:
+        raise ValueError("Planejamento não encontrado.")
+
+    planning_rules.ensure_same_region(actor, header["region"])
+
+    assignments = planning_read_db.list_planning_assignments_detailed(planning_id)
+
+    return {
+        "planning": header,
+        "assignments": assignments,
+    }
+
+# ---------------------------
+# VISUALIZAÇÃO - PESQUISADOR
+# ---------------------------
+
+def researcher_view_current_week(actor_payload: dict[str, Any], today: Optional[date] = None) -> dict[str, Any]:
+    """
+    Mostra o planejamento da semana atual (por região do pesquisador) e as lojas atribuídas.
+    """
+    actor = auth_service.require_authenticated(actor_payload)
+    auth_service.require_active_user(actor)
+    if actor.role != "PESQUISADOR":
+        raise PermissionError("Ação permitida apenas para PESQUISADOR.")
+
+    if not actor.region:
+        raise ValueError("Pesquisador sem região definida.")
+
+    today = today or date.today()
+    ws = week_start_monday(today)
+
+    planning = planning_read_db.find_planning_by_region_week(actor.region, ws)
+    if not planning:
+        return {
+            "planning": None,
+            "assignments": [],
+            "message": f"Não existe planejamento para {actor.region} na semana iniciando em {ws}."
+        }
+
+    tasks = planning_read_db.list_researcher_week_tasks(
+        researcher_id=actor.id,
+        planning_id=planning["id"],
+    )
+
+    return {
+        "planning": planning,
+        "assignments": tasks,
+        "message": None
+    }
 
 # ---------------------------
 # Weekly Planning CRUD (mínimo)
