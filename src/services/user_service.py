@@ -15,7 +15,6 @@ def _now() -> str:
 def _get_actor(payload):
     actor = auth_service.require_authenticated(payload)
     return auth_service.require_active_user(actor)
-
 # ---------------------------
 # CRUD de usuários (ADMIN)
 # ---------------------------
