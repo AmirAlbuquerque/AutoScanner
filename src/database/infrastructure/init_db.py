@@ -120,5 +120,5 @@ def seed_admin(email: str = "admin@autoscanner.local", password: str = "admin123
         )
 
 def init_db() -> None:
-    create_users()
+    create_tables()
     seed_admin()
