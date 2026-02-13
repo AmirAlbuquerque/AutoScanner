@@ -6,7 +6,6 @@ import src.services.store_service as store_service
 def actor_payload():
     return {"email": "x@y.com"}
 
-
 def actor(*, role: str, region: str | None = None, id: str = "u-1"):
     return SimpleNamespace(id=id, role=role, region=region)
 

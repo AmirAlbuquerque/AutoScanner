@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import pytest
 import src.database.infrastructure.repositories.stores_db as stores_db
 
+
 DDL = """
 CREATE TABLE IF NOT EXISTS stores (
     id TEXT PRIMARY KEY,
