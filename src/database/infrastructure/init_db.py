@@ -131,6 +131,42 @@ def create_tables() -> None:
         );
         """)
 
+        # Criação da tabela de snapshots de preços
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS price_snapshots (
+            id TEXT PRIMARY KEY,
+            region TEXT NOT NULL,
+            brand_id TEXT NOT NULL,
+            model_id TEXT NOT NULL,
+            version_id TEXT NOT NULL,
+            year_model INTEGER NOT NULL,
+            ref_month TEXT NOT NULL,       -- YYYY-MM
+            fipe_price REAL,
+            avg_price REAL,
+            samples INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(brand_id) REFERENCES brands(id),
+            FOREIGN KEY(model_id) REFERENCES models(id),
+            FOREIGN KEY(version_id) REFERENCES versions(id),
+            UNIQUE(region, brand_id, model_id, COALESCE(version_id, ''), COALESCE(year_model, -1), ref_month)
+        );
+        """)
+
+        # Criação da tabela de consultas públicas
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS public_queries (
+            id TEXT PRIMARY KEY,
+            brand_id TEXT NOT NULL,
+            model_id TEXT NOT NULL,
+            version_id TEXT NOT NULL,
+            year_model INTEGER NOT NULL,
+            region TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            actor_user_id TEXT,
+            FOREIGN KEY(actor_user_id) REFERENCES users(id)
+        );
+        """)
+
 def seed_admin(email: str = "admin@autoscanner.local", password: str = "admin123") -> None:
     """Cria admin padrão se não existir. Troque depois."""
     pw_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
