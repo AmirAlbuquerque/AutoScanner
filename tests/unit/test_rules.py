@@ -194,5 +194,5 @@ def test_ensure_can_capture_denies_when_planning_status_false():
             actor=actor(role="PESQUISADOR"),
             store_status="APROVADA",
             assigned_to_researcher=True,
-            planning_status="PUBLICADO",
+            planning_status="RASCUNHO",
         )
