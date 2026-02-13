@@ -1,6 +1,6 @@
 import datetime
 from typing import Any
-from pytz import timezone
+from datetime import datetime, timezone
 from src.services import auth_service
 from src.domain.store_rules import (
     ensure_store_submitter,
@@ -24,4 +24,4 @@ def approve_store(actor_payload: dict[str, Any], store_id: str) -> None:
     store = stores_db.get_store(store_id)  # precisa de region
     ensure_can_approve_store(actor, store["region"])
 
-    stores_db.approve_store(store_id, approved_by=actor.id, approved_at=_now(), updated_at=_now())
+    stores_db.approve_store(store_id, actor.id, _now(), _now())
