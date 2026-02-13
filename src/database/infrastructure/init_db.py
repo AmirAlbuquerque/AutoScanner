@@ -73,6 +73,36 @@ def create_tables() -> None:
         );
         """)
 
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS captures (
+            id TEXT PRIMARY KEY,
+            store_id TEXT NOT NULL,
+            researcher_id TEXT NOT NULL,
+            capture_date TEXT NOT NULL,   -- timestamp
+            capture_month TEXT NOT NULL,  -- YYYY-MM (competência)
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(store_id) REFERENCES stores(id),
+            FOREIGN KEY(researcher_id) REFERENCES users(id)
+        );
+        """)
+
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS vehicle_captures (
+            id TEXT PRIMARY KEY,
+            capture_id TEXT NOT NULL,
+            brand_id TEXT NOT NULL,
+            model_id TEXT NOT NULL,
+            version_id TEXT NOT NULL,
+            year_fabrication INTEGER NOT NULL,
+            price REAL NOT NULL CHECK(price >= 0),
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(capture_id) REFERENCES captures(id),
+            FOREIGN KEY(brand_id) REFERENCES brands(id),
+            FOREIGN KEY(model_id) REFERENCES models(id),
+            FOREIGN KEY(version_id) REFERENCES versions(id)
+        );
+        """)
+        
         #Criação da tabela de planejamentos semanais
         conn.execute("""
         CREATE TABLE IF NOT EXISTS weekly_plannings (
