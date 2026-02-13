@@ -42,6 +42,37 @@ def create_tables() -> None:
         );
         """)
 
+        # Criação da tabela de brands
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS brands (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE
+        );
+        """)
+
+        #Criação da tabela de models
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS models (
+            id TEXT PRIMARY KEY,
+            brand_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            UNIQUE(brand_id, name),
+            FOREIGN KEY(brand_id) REFERENCES brands(id)
+        );
+        """)
+
+        #Criação da tabela de versions
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS versions (
+            id TEXT PRIMARY KEY,
+            model_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            image_url TEXT,
+            UNIQUE(model_id, name),
+            FOREIGN KEY(model_id) REFERENCES models(id)
+        );
+        """)
+
 def seed_admin(email: str = "admin@autoscanner.local", password: str = "admin123") -> None:
     """Cria admin padrão se não existir. Troque depois."""
     pw_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
