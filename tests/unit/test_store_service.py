@@ -95,6 +95,6 @@ def test_service_approve_store_fetches_store_checks_rule_and_calls_db(mocks, act
 
     # aprovou no DB com approved_by=actor.id
     assert len(mocks["db_approve_store"]) == 1
-    _args, kwargs = mocks["db_approve_store"][0]
-    assert kwargs["store_id"] == "store-999"
+    args, kwargs = mocks["db_approve_store"][0]
+    assert args[0] == "store-999"
     assert kwargs["approved_by"] == "u-coord"
