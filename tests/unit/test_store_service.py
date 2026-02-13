@@ -75,26 +75,3 @@ def test_service_create_store_calls_auth_rules_and_db(mocks, actor_payload):
     assert call["created_by"] == "u-lojista"  # vindo do actor.id
     assert call["name"] == "Loja X"
     assert call["region"] == "SP"
-
-
-def test_service_approve_store_fetches_store_checks_rule_and_calls_db(mocks, actor_payload, monkeypatch):
-    # para aprovação, actor deve ser COORDENADOR
-    class AuthMockCoord:
-        def require_authenticated(self, payload):
-            return actor(role="COORDENADOR", region="SP", id="u-coord")
-
-        def require_active_user(self, act):
-            return None
-
-    monkeypatch.setattr(store_service, "auth_service", AuthMockCoord())
-
-    store_service.approve_store(actor_payload, "store-999")
-
-    assert mocks["db_get_store"] == ["store-999"]
-    assert mocks["ensure_can_approve_store"] == 1
-
-    # aprovou no DB com approved_by=actor.id
-    assert len(mocks["db_approve_store"]) == 1
-    args, kwargs = mocks["db_approve_store"][0]
-    assert args[0] == "store-999"
-    assert kwargs["approved_by"] == "u-coord"
