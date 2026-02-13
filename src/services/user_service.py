@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 from src.database.infrastructure.repositories import user_db
 from src.services import auth_service
-from domain import user_rules
+from src.domain import user_rules
 from src.common.logging import get_logger
 
 logger = get_logger("user_service")
@@ -28,7 +28,8 @@ def admin_create_user(
     password: str,
     active: int = 1,
 ) -> str:
-    auth_service._require_admin(actor_payload)
+    actor = _get_actor(actor_payload)
+    user_rules.ensure_admin(actor)
 
     role = role.strip().upper()
     if role not in ROLES:

@@ -59,9 +59,5 @@ def seed_admin(email: str = "admin@autoscanner.local", password: str = "admin123
         )
 
 def init_db() -> None:
-    create_tables()
+    create_users()
     seed_admin()
-
-if __name__ == "__main__":
-    init_db()
-    print("DB inicializado.")
