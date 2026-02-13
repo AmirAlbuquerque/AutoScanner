@@ -1,7 +1,9 @@
 import uuid
 import bcrypt
+import random
 from datetime import datetime, timezone
 from src.database.infrastructure.connection import get_conn
+from src.database.data.seed import run_seed
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -185,3 +187,4 @@ def seed_admin(email: str = "admin@autoscanner.local", password: str = "admin123
 def init_db() -> None:
     create_tables()
     seed_admin()
+    run_seed()
