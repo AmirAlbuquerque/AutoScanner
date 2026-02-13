@@ -112,7 +112,7 @@ def test_create_user_crud_happy_path(mocks, actor_payload, fixed_now):
         email="  JOHN@EXAMPLE.COM ",
         role=" lojista ",
         region="SP",
-        password="secret1",
+        password_hash="secret1",
         active=1,
     )
 
