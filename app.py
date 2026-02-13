@@ -130,6 +130,8 @@ if submit:
         st.session_state.last_query = None
     else:
         try:
+            actor_user_id = (current_user() or {}).get("id") if is_logged_in() else None
+
             result = public_query_prices(
                 region=region,
                 capture_month=capture_month,
@@ -137,6 +139,7 @@ if submit:
                 model_id=model_id,
                 version_id=version_id,
                 year_fabrication=year_fabrication,
+                actor_user_id=actor_user_id,
             )
 
             st.session_state.last_query = result

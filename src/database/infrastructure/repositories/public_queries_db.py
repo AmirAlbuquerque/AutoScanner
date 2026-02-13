@@ -1,7 +1,49 @@
+from datetime import datetime, timezone
 from typing import Any, Optional
-
+import uuid
 from src.database.infrastructure.connection import get_conn
 
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def insert_public_query_log(
+    *,
+    region: str,
+    brand_id: str,
+    model_id: str,
+    version_id: Optional[str],
+    year_model: Optional[int],
+    actor_user_id: Optional[str],
+) -> str:
+    """
+    Registra um log simples em public_queries.
+    Retorna o id inserido.
+    """
+    qid = str(uuid.uuid4())
+    v = version_id if version_id else "__ALL__"
+    y = year_model if year_model is not None else -1
+
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO public_queries
+            (id, brand_id, model_id, version_id, year_model, region, created_at, actor_user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                qid,
+                brand_id,
+                model_id,
+                v,
+                y,
+                region,
+                _now_iso(),
+                actor_user_id,
+            ),
+        )
+
+    return qid
 
 def compute_monthly_avg_and_samples(
     *,

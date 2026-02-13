@@ -24,6 +24,7 @@ def public_query_prices(
     model_id: str,
     version_id: Optional[str],
     year_fabrication: Optional[int],
+    actor_user_id: Optional[str] = None,
 ) -> PublicQueryResult:
     """
     Consulta pública:
@@ -39,6 +40,15 @@ def public_query_prices(
         model_id=model_id,
         version_id=version_id,
         year_fabrication=year_fabrication,
+    )
+
+    public_queries_db.insert_public_query_log(
+        brand_id=f.brand_id,
+        model_id=f.model_id,
+        version_id=f.version_id,
+        year_model=f.year_fabrication,
+        region=f.region,
+        actor_user_id=actor_user_id,
     )
 
     samples, avg_price = public_queries_db.compute_monthly_avg_and_samples(

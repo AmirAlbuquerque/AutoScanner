@@ -147,8 +147,7 @@ def create_tables() -> None:
             created_at TEXT NOT NULL,
             FOREIGN KEY(brand_id) REFERENCES brands(id),
             FOREIGN KEY(model_id) REFERENCES models(id),
-            FOREIGN KEY(version_id) REFERENCES versions(id),
-            UNIQUE(region, brand_id, model_id, COALESCE(version_id, ''), COALESCE(year_model, -1), ref_month)
+            FOREIGN KEY(version_id) REFERENCES versions(id)
         );
         """)
 
