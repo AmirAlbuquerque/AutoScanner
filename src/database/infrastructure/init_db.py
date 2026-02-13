@@ -102,6 +102,34 @@ def create_tables() -> None:
             FOREIGN KEY(version_id) REFERENCES versions(id)
         );
         """)
+        
+        #Criação da tabela de planejamentos semanais
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS weekly_plannings (
+            id TEXT PRIMARY KEY,
+            coordinator_id TEXT NOT NULL,
+            region TEXT NOT NULL,
+            week_start TEXT NOT NULL, -- YYYY-MM-DD
+            status TEXT NOT NULL CHECK(status IN ('RASCUNHO','PUBLICADO')),
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(coordinator_id) REFERENCES users(id),
+            UNIQUE(region, week_start)
+        );
+        """)
+
+        #Criação da tabela de atribuições de planejamento
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS planning_assignments (
+            id TEXT PRIMARY KEY,
+            planning_id TEXT NOT NULL,
+            store_id TEXT NOT NULL,
+            researcher_id TEXT NOT NULL,
+            FOREIGN KEY(planning_id) REFERENCES weekly_plannings(id),
+            FOREIGN KEY(store_id) REFERENCES stores(id),
+            FOREIGN KEY(researcher_id) REFERENCES users(id),
+            UNIQUE(planning_id, store_id, researcher_id)
+        );
+        """)
 
 def seed_admin(email: str = "admin@autoscanner.local", password: str = "admin123") -> None:
     """Cria admin padrão se não existir. Troque depois."""
