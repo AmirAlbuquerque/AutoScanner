@@ -145,6 +145,7 @@ def test_ensure_can_capture_allows_when_researcher_and_store_aprovada_and_assign
         actor=actor(role="PESQUISADOR"),
         store_status="APROVADA",
         assigned_to_researcher=True,
+        planning_status="PUBLICADO",
     )
 
 
@@ -153,6 +154,7 @@ def test_ensure_can_capture_allows_when_assigned_is_none():
         actor=actor(role="PESQUISADOR"),
         store_status="APROVADA",
         assigned_to_researcher=None,
+        planning_status="PUBLICADO",
     )
 
 
@@ -162,6 +164,7 @@ def test_ensure_can_capture_denies_when_not_researcher():
             actor=actor(role="ADMIN"),
             store_status="APROVADA",
             assigned_to_researcher=True,
+            planning_status="PUBLICADO",
         )
 
 
@@ -171,6 +174,7 @@ def test_ensure_can_capture_denies_when_store_not_aprovada():
             actor=actor(role="PESQUISADOR"),
             store_status="PENDENTE",
             assigned_to_researcher=True,
+            planning_status="PUBLICADO",
         )
 
 
@@ -180,4 +184,15 @@ def test_ensure_can_capture_denies_when_assigned_false():
             actor=actor(role="PESQUISADOR"),
             store_status="APROVADA",
             assigned_to_researcher=False,
+            planning_status="PUBLICADO",
+        )
+
+
+def test_ensure_can_capture_denies_when_planning_status_false():
+    with pytest.raises(PermissionError, match="PUBLICADO"):
+        capture_rule.ensure_can_capture(
+            actor=actor(role="PESQUISADOR"),
+            store_status="APROVADA",
+            assigned_to_researcher=True,
+            planning_status="PUBLICADO",
         )
