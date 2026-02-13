@@ -2,20 +2,22 @@ from src.database.infrastructure.connection import get_conn
 from typing import Any, Optional
 
 def create_user (
+    *,
     user_id: str,
     name: str,
     email: str,
     role: str,
     region: Optional[str],
     hash_password: str,
-    active: int, date) :
+    active: int,
+    created_at: str,) -> None:
     with get_conn() as conn:
         conn.execute(
             """
             INSERT INTO users (id, name, email, role, region, password_hash, active, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (user_id, name.strip(), email, role, region, hash_password, int(active), date)
+            (user_id, name.strip(), email, role, region, hash_password, int(active), created_at)
         )
 
 def list_users () -> list[dict[str, Any]]: 
@@ -41,7 +43,14 @@ def get_user_by_email(email: str) -> Optional [dict[str, Any]] :
         ).fetchone()
         return dict(row) if row else None
 
-def update_user(user_id: str, name: str, email: str, role: str, region: Optional[str], active: int) -> None:
+def update_user(
+    *,
+    user_id: str,
+    name: str,
+    email: str,
+    role: str,
+    region: Optional[str],
+    active: int) -> None:
      with get_conn() as conn:
         conn.execute(
             """
@@ -52,7 +61,7 @@ def update_user(user_id: str, name: str, email: str, role: str, region: Optional
             (name.strip(), email.strip().lower(), role, region, int(active), user_id)
         )
 
-def set_password (user_id: str, new_hash_password: str) -> None:
+def set_password (*, user_id: str, new_hash_password: str) -> None:
         with get_conn() as conn:
             conn.execute(
                 "UPDATE users SET password_hash = ? WHERE id = ?",

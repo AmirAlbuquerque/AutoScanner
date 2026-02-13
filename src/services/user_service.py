@@ -40,7 +40,7 @@ def admin_create_user(
     email_norm = email.strip().lower()
     pw_hash = auth_service._hash_password(password)
 
-    user_db.create_user(user_id, name.strip(), email_norm, role, region, pw_hash, int(active), _now())
+    user_db.create_user(user_id=user_id, name=name.strip(), email=email_norm, role=role, region=region, password_hash=pw_hash, active=int(active), created_at=_now())
 
     logger.info(f"[ADMIN_CREATE_USER] actor={actor_payload.get('email')} created={email_norm} role={role}")
     return user_id
@@ -73,7 +73,7 @@ def admin_update_user(
 
     email_norm = email.strip().lower()
 
-    user_db.update_user(name, email_norm, role, region, active, user_id)
+    user_db.update_user(user_id=user_id, name=name.strip(), email=email_norm, role=role, region=region, active=active)
 
     logger.info(f"[ADMIN_UPDATE_USER] actor={actor_payload.get('email')} updated={email_norm} role={role} active={active}")
 
@@ -88,7 +88,7 @@ def admin_set_password(
         raise ValueError("Senha deve ter pelo menos 6 caracteres.")
 
     pw_hash = auth_service._hash_password(new_password)
-    user_db.set_password(pw_hash,user_id)
+    user_db.set_password(user_id=user_id, new_hash_password=pw_hash)
 
     logger.info(f"[ADMIN_SET_PASSWORD] actor={actor_payload.get('email')} user_id={user_id}")
 
