@@ -2,11 +2,12 @@ import streamlit as st
 from datetime import datetime
 from src.database.infrastructure.init_db import init_db
 from src.ui.session import is_logged_in, current_user, logout
-
+from src.database.data.seed import run_seed
 from src.services import catalog_service
 from src.services.public_queries_service import public_query_prices
 
 init_db()
+run_seed()
 
 st.set_page_config(page_title="AutoScanner", page_icon="🚗", layout="wide")
 
