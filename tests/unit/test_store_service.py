@@ -127,3 +127,4 @@ def test_approve_store_fetches_store_checks_rule_and_calls_db(actor_payload, dep
     args, kwargs = calls["db.approve_store"][0]
     assert args[0] == "store-999"
     assert args[1] == "u-coord"
+    
