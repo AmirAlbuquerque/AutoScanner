@@ -123,3 +123,20 @@ def manager_delete_version(actor_payload: dict[str, Any], version_id: str) -> No
     catalog_rules.ensure_manager(actor)
 
     versions_db.delete_version(version_id)
+
+# ---------------------------
+# Público (Home)
+# ---------------------------
+
+def public_list_brands() -> list[dict[str, Any]]:
+    return brands_db.list_brands()
+
+def public_list_models(brand_id: str) -> list[dict[str, Any]]:
+    if not brands_db.get_brand(brand_id):
+        return []
+    return models_db.list_models_by_brand(brand_id)
+
+def public_list_versions(model_id: str) -> list[dict[str, Any]]:
+    if not models_db.get_model(model_id):
+        return []
+    return versions_db.list_versions_by_model(model_id)
