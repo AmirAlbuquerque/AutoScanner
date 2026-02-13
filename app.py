@@ -1,12 +1,12 @@
 import streamlit as st
 from src.ui.session import current_user, is_logged_in
 from src.database.infrastructure.init_db import init_db
+init_db()
 
 st.set_page_config(page_title="AutoScanner", layout="wide")
 
 st.title("AutoScanner")
 
-init_db()
 
 if not is_logged_in():
     st.info("Você não está logado. Vá para a página de Login.")

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 from src.database.infrastructure.repositories import user_db
 from src.services import auth_service
-from domain import user_rules
+from src.domain import user_rules
 from src.common.logging import get_logger
 
 logger = get_logger("user_service")
