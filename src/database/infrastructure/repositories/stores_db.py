@@ -203,3 +203,32 @@ def inactivate_store(
             """,
             (status, updated_at, store_id),
         )
+
+def get_store_region_and_status(store_id: str) -> Optional[dict[str, Any]]:
+    """
+    Retorna só os campos que o service precisa para autorização/fluxo.
+    """
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT id, region, status, owner_id, created_by FROM stores WHERE id = ?",
+            (store_id,),
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def list_approved_stores_by_region(region: str, limit: int = 200) -> list[dict[str, Any]]:
+    """
+    Para pesquisador selecionar loja APROVADA na região.
+    """
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, owner_id, name, region, status, created_at, updated_at
+            FROM stores
+            WHERE region = ? AND status = 'APROVADA'
+            ORDER BY name ASC
+            LIMIT ?
+            """,
+            (region, int(limit)),
+        ).fetchall()
+    return [dict(r) for r in rows]
