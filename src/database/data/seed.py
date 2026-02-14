@@ -3,8 +3,6 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 import bcrypt
-
-from src.database.infrastructure.init_db import init_db
 from src.database.infrastructure.connection import get_conn
 
 
@@ -37,8 +35,6 @@ def run_seed() -> None:
       - cada captura contém todas as versões (8*8 = 64 vehicle_captures)
     """
 
-    init_db()
-
     REGION = "Grande Belo Horizonte"
     MONTH = "2026-02"
     CAPTURE_DATE = "2026-02-15T10:00:00+00:00"
@@ -68,10 +64,10 @@ def run_seed() -> None:
             )
             return uid
 
-        admin_id = get_or_create_user("Admin", "admin@auto.com", "ADMIN", None)
-        coord_id = get_or_create_user("Carlos Coordenador", "coord@auto.com", "COORDENADOR", REGION)
-        pesquisador_id = get_or_create_user("Pedro Pesquisador", "pesq@auto.com", "PESQUISADOR", REGION)
-        lojista_id = get_or_create_user("Lojista BH", "lojista@auto.com", "LOJISTA", REGION)
+        admin_id = get_or_create_user("Admin", "admin@autoscanner.local", "ADMIN", None)
+        coord_id = get_or_create_user("Carlos Coordenador", "coord@autoscanner.local", "COORDENADOR", REGION)
+        pesquisador_id = get_or_create_user("Pedro Pesquisador", "pesq@autoscanner.local", "PESQUISADOR", REGION)
+        lojista_id = get_or_create_user("Lojista BH", "lojista@autoscanner.local", "LOJISTA", REGION)
 
         # -------------------------
         # CATALOG helpers
