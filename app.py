@@ -2,7 +2,6 @@ import streamlit as st
 from datetime import datetime
 from src.database.infrastructure.init_db import init_db
 from src.ui.session import is_logged_in, current_user, logout
-
 from src.services import catalog_service
 from src.services.public_queries_service import public_query_prices
 
