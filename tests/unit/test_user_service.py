@@ -56,7 +56,7 @@ def mocks(monkeypatch, actor):
             calls["ensure_admin"] += 1
 
     class UserDbMock:
-        def create_user(self, user_id, name, email, role, region, pw_hash, active, created_at):
+        def create_user(self, *, user_id, name, email, role, region, password_hash, active, created_at):
             calls["create_user"].append(
                 dict(
                     user_id=user_id,
@@ -64,7 +64,7 @@ def mocks(monkeypatch, actor):
                     email=email,
                     role=role,
                     region=region,
-                    pw_hash=pw_hash,
+                    password_hash=password_hash,
                     active=active,
                     created_at=created_at,
                 )
@@ -83,8 +83,8 @@ def mocks(monkeypatch, actor):
                 dict(name=name, email=email, role=role, region=region, active=active, user_id=user_id)
             )
 
-        def set_password(self, pw_hash, user_id):
-            calls["set_password"].append(dict(pw_hash=pw_hash, user_id=user_id))
+        def set_password(self, password_hash, user_id):
+            calls["set_password"].append(dict(password_hash=password_hash, user_id=user_id))
 
         def delete_user(self, user_id):
             calls["delete_user"].append(user_id)
@@ -112,7 +112,7 @@ def test_create_user_crud_happy_path(mocks, actor_payload, fixed_now):
         email="  JOHN@EXAMPLE.COM ",
         role=" lojista ",
         region="SP",
-        password_hash="secret1",
+        password="secret1",
         active=1,
     )
 
@@ -120,8 +120,9 @@ def test_create_user_crud_happy_path(mocks, actor_payload, fixed_now):
 
     assert mocks["hash_password"] == ["secret1"]
     assert len(mocks["create_user"]) == 1
-    call = mocks["create_user"][0]
 
+    call = mocks["create_user"][0]
+    assert call["password_hash"] == "hash(secret1)"
     # Normalizações importantes do create
     assert call["user_id"] == user_id
     assert call["name"] == "John Doe"
